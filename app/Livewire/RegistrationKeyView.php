@@ -14,10 +14,16 @@ class RegistrationKeyView extends Component
 
     public int $numberOfKeys = 1;
     public string $status = "unused";
+    public string $search = '';
 
     public function deleteKey(RegistrationKey $key)
     {
         $key->delete();
+    }
+
+    public function copyKey($key)
+    {
+        $this->dispatch('copyKey', $key);
     }
 
     public function generateKeys()
@@ -33,7 +39,18 @@ class RegistrationKeyView extends Component
 
     public function render()
     {
+        $keys = RegistrationKey::query();
+
+        if ($this->status === 'used') {
+            $keys = $keys->whereHas('usage');
+        } elseif ($this->status === 'unused') {
+            $keys = $keys->doesntHave('usage');
+        }
+
         return view('livewire.registration-key-view')
-            ->with('keys', RegistrationKey::query()->paginate(4));
+            ->with(
+                'keys',
+                $keys->paginate(4)
+            );
     }
 }

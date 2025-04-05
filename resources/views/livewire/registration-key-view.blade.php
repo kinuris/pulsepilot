@@ -1,9 +1,47 @@
-<div class="flex bg-gray-900 min-h-screen text-gray-200">
+<div class="relative flex bg-gray-900 min-h-screen text-gray-200">
     <!-- This is a sidebar -->
     <livewire:layout.admin-nav />
 
     <!-- This is a spacer -->
     <div class="w-64 hidden sm:block"></div>
+
+    <!-- Notification Modal -->
+    <div
+        x-data="{ show: false, message: '', key: '' }"
+        x-show="show"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform scale-95"
+        x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-95"
+        x-init="$wire.on('copyKey', (keyValue) => { 
+            navigator.clipboard.writeText(keyValue).then(() => {
+                show = true; 
+                key = keyValue;
+                message = 'Registration key copied to clipboard:'; 
+                setTimeout(() => show = false, 3000);
+            }).catch(err => {
+                console.error('Failed to copy key: ', err);
+                show = true;
+                key = keyValue;
+                message = 'Unable to copy automatically. Please select and copy manually:';
+                setTimeout(() => show = false, 5000);
+            });
+        })"
+        class="fixed top-6 inset-x-0 z-50 flex justify-center"
+        style="display: none;">
+        <div class="bg-gray-800 border border-gray-700 text-gray-200 px-6 py-4 rounded-md shadow-xl max-w-lg flex flex-col">
+            <div class="flex items-center space-x-3 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                </svg>
+                <span x-text="message" class="font-medium"></span>
+            </div>
+            <div class="mt-1 bg-gray-700 px-3 py-2 rounded font-mono text-sm text-indigo-300 break-all select-all" x-text="key"></div>
+        </div>
+    </div>
 
     <div class="flex-1 mt-16 sm:mt-0 px-3 sm:px-6 py-4 sm:py-6">
         <div class="max-w-7xl mx-auto">
@@ -19,10 +57,10 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
-                            <input wire:model.debounce.300ms="search" type="text" placeholder="Search keys..." 
+                            <input wire:model.debounce.300ms="search" type="text" placeholder="Search keys..."
                                 class="border border-gray-700 bg-gray-700 rounded-md pl-10 pr-4 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500 text-gray-200 placeholder-gray-400">
                         </div>
-                        <select wire:model="status" class="border border-gray-700 bg-gray-700 rounded-md px-4 py-2 text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
+                        <select wire:model.live="status" class="border border-gray-700 bg-gray-700 rounded-md px-4 py-2 text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                             <option value="all">All Status</option>
                             <option value="unused">Unused</option>
                             <option value="used">Used</option>
@@ -65,9 +103,9 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ $key->created_at->format('M d, Y') }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ $key->user->name ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ $key->usage->user->name ?? 'N/A' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <button wire:click="copyKey('{{ $key->key }}')" class="inline-flex items-center text-indigo-400 hover:text-indigo-300">
+                                    <button wire:click="copyKey('{{ $key->key_string }}')" class="inline-flex items-center text-indigo-400 hover:text-indigo-300">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" />
                                         </svg>
@@ -119,7 +157,7 @@
                             </div>
                         </div>
                         <div class="mt-3 flex space-x-3 justify-end">
-                            <button wire:click="copyKey('{{ $key->key }}')" class="inline-flex items-center text-indigo-400 hover:text-indigo-300">
+                            <button wire:click="copyKey('{{ $key->key_string }}')" class="inline-flex items-center text-indigo-400 hover:text-indigo-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" />
                                 </svg>
@@ -146,7 +184,7 @@
 
                 <div class="mb-4 sm:mb-6">
                     <label class="block text-sm font-medium text-gray-300 mb-2">Number of Keys</label>
-                    <input wire:model="numberOfKeys" type="number" min="1" max="100" 
+                    <input wire:model="numberOfKeys" type="number" min="1" max="100"
                         class="border border-gray-700 bg-gray-700 rounded-md w-full px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-200">
                     @error('numberOfKeys') <span class="text-red-400 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
