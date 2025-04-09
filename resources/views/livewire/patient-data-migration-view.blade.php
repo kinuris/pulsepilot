@@ -85,27 +85,27 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 dark:text-gray-300">{{ $patient->province }}</td>
                                 <td wire:poll.30s class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 dark:text-gray-300">
                                     @if($patient->isOnline())
-                                        <span class="inline-flex items-center rounded-full bg-green-600 px-2.5 py-0.5 text-xs font-medium text-white">
-                                            <span class="flex h-2 w-2 mr-1.5">
-                                                <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
-                                                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                                            </span>
-                                            Online now
+                                    <span class="inline-flex items-center rounded-full bg-green-600 px-2.5 py-0.5 text-xs font-medium text-white">
+                                        <span class="flex h-2 w-2 mr-1.5">
+                                            <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                         </span>
+                                        Online now
+                                    </span>
                                     @elseif($patient->lastOnline() != null)
-                                        <span class="inline-flex items-center text-gray-400">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            {{ \Carbon\Carbon::parse($patient->lastOnline())->diffForHumans() }}
-                                        </span>
+                                    <span class="inline-flex items-center text-gray-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {{ \Carbon\Carbon::parse($patient->lastOnline())->diffForHumans() }}
+                                    </span>
                                     @else
-                                        <span class="inline-flex items-center text-gray-500">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m-3.536-3.536a5 5 0 010-7.07m-3.182 3.182a1 1 0 110 1.415" />
-                                            </svg>
-                                            Never connected
-                                        </span>
+                                    <span class="inline-flex items-center text-gray-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m-3.536-3.536a5 5 0 010-7.07m-3.182 3.182a1 1 0 110 1.415" />
+                                        </svg>
+                                        Never connected
+                                    </span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-3">
@@ -149,6 +149,7 @@
                                                     x-transition:leave="ease-in duration-200"
                                                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                                                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                                    x-init="$wire.on('patientDeleted', () => { showDeleteModal = false; })"
                                                     class="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-800 rounded-lg shadow-xl sm:my-12">
                                                     <div class="sm:flex sm:items-start">
                                                         <!-- Warning icon -->
@@ -173,10 +174,15 @@
                                                             class="inline-flex justify-center px-4 py-2 text-base font-medium text-gray-200 transition-colors duration-150 bg-gray-700 border border-gray-600 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm">
                                                             Cancel
                                                         </button>
-                                                        <button @click="showDeleteModal = false"
+                                                        <button
                                                             wire:click="deletePatient(patientToDelete)"
-                                                            class="inline-flex justify-center px-4 py-2 text-base font-medium text-white transition-colors duration-150 bg-red-700 border border-transparent rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
-                                                            Delete Record
+                                                            class="inline-flex justify-center px-4 py-2 text-white bg-red-700 rounded-md hover:bg-red-600 focus:outline-none"
+                                                            wire:loading.attr="disabled">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                            <span wire:loading.remove>Delete</span>
+                                                            <span wire:loading>Processing...</span>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -197,59 +203,25 @@
                             @endforelse
                         </tbody>
                     </table>
-
-                    <script>
-                        function copyToClipboard(elementId) {
-                            const text = document.getElementById(elementId).innerText;
-                            navigator.clipboard.writeText(text).then(() => {
-                                // Show a brief flash of success
-                                const button = document.querySelector(`#${elementId}`).nextElementSibling;
-                                const originalColor = button.classList.contains('text-gray-400') ? 'text-gray-400' : 'text-gray-200';
-
-                                button.classList.remove(originalColor);
-                                button.classList.add('text-green-400');
-
-                                setTimeout(() => {
-                                    button.classList.remove('text-green-400');
-                                    button.classList.add(originalColor);
-                                }, 1000);
-                            });
-                        }
-                    </script>
                 </div>
+                <script>
+                    function copyToClipboard(elementId) {
+                        const text = document.getElementById(elementId).innerText;
+                        navigator.clipboard.writeText(text).then(() => {
+                            // Show a brief flash of success
+                            const button = document.querySelector(`#${elementId}`).nextElementSibling;
+                            const originalColor = button.classList.contains('text-gray-400') ? 'text-gray-400' : 'text-gray-200';
 
-                <!-- Mobile Card Layout (shown only on mobile) -->
-                <div class="sm:hidden space-y-4">
-                    @forelse($patients as $patient)
-                    <div class="bg-gray-700 rounded-lg p-4 dark:bg-gray-800">
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="text-sm mb-2">
-                                <h3 class="font-semibold text-gray-200 dark:text-gray-100">{{ $patient->name }}</h3>
-                                <p class="text-gray-400 dark:text-gray-500">{{ $patient->email }}</p>
-                            </div>
-                            <span class="px-3 py-1 text-xs leading-5 font-semibold rounded-full {{ $patient->is_active ? 'bg-green-900 text-green-200 dark:bg-green-800 dark:text-green-200' : 'bg-red-900 text-red-200 dark:bg-red-800 dark:text-red-200' }}">
-                                {{ $patient->is_active ? 'Active' : 'Inactive' }}
-                            </span>
-                        </div>
-                        <div class="mt-3 flex space-x-3 justify-end">
-                            <button wire:click="editPatient({{ $patient->id }})" class="inline-flex items-center text-indigo-400 hover:text-indigo-300 dark:text-indigo-400 dark:hover:text-indigo-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                                Edit
-                            </button>
-                            <button wire:click="deletePatient({{ $patient->id }})" class="inline-flex items-center text-red-400 hover:text-red-300 dark:text-red-400 dark:hover:text-red-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="text-center py-4 text-gray-400 dark:text-gray-500">No patient records found</div>
-                    @endforelse
-                </div>
+                            button.classList.remove(originalColor);
+                            button.classList.add('text-green-400');
+
+                            setTimeout(() => {
+                                button.classList.remove('text-green-400');
+                                button.classList.add(originalColor);
+                            }, 1000);
+                        });
+                    }
+                </script>
             </div>
         </div>
     </div>

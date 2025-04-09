@@ -11,8 +11,21 @@ class PatientDataMigrationView extends Component
 
     public function deletePatient(Patient $patient)
     {
+        $patient->connections()->delete();
+        $patient->chatMessages()->delete();
+        $patient->immunizations()->delete();
+        $patient->pastConditions()->delete();
+        $patient->bmiRecords()->delete();
+        $patient->waterRecords()->delete();
+        $patient->glucoseRecords()->delete();
+        $patient->nutritionRecords()->delete();
+        $patient->activityRecords()->delete();
+        $patient->medicationRecords()->delete();
+        $patient->labRequests()->delete();
+
+        $this->dispatch('patientDeleted');
+
         $patient->delete();
-        
     }
 
     public function render()

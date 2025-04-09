@@ -21,6 +21,16 @@ class Patient extends Model
         return Cache::get($key);
     }
 
+    public function chatMessages()
+    {
+        return $this->hasMany(ChatMessage::class);
+    }
+
+    public function labRequests()
+    {
+        return $this->hasMany(LabRequest::class);
+    }
+
     public function connections()
     {
         return $this->hasMany(Connection::class);
