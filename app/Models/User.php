@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
@@ -46,6 +47,26 @@ class User extends Authenticatable
             ->where('user_id', '=', Auth::user()->id)
             ->get()
             ->map(fn($q) => $q->patient);
+    }
+
+    public function isOnline()
+    {
+        return Cache::has('online-' . $this->id);
+    }
+
+    public function suspended()
+    {
+        return $this->hasOne(DoctorSuspend::class, 'doctor_id');
+    }
+
+    public function msgAlerts()
+    {
+        $userId = $this->id;
+        $keys = Cache::get('msgalert-keys-' . Auth::user()->id, []);
+
+        return collect($keys)
+            ->filter(fn($key) => str_contains($key, 'msgalert-' . $userId))
+            ->map(fn($key) => Cache::get($key));
     }
 
     protected function casts(): array

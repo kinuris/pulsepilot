@@ -57,7 +57,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
-                            <input wire:model.debounce.300ms="search" type="text" placeholder="Search keys..."
+                            <input wire:model.live="search" type="text" placeholder="Search keys..."
                                 class="border border-gray-700 bg-gray-700 rounded-md pl-10 pr-4 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500 text-gray-200 placeholder-gray-400">
                         </div>
                         <select wire:model.live="status" class="border border-gray-700 bg-gray-700 rounded-md px-4 py-2 text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
@@ -98,8 +98,8 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $key->is_used ? 'bg-red-900 text-red-200' : 'bg-green-900 text-green-200' }}">
-                                        {{ $key->is_used ? 'Used' : 'Unused' }}
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $key->usage ? 'bg-red-900 text-red-200' : 'bg-green-900 text-green-200' }}">
+                                        {{ $key->usage ? 'Used' : 'Unused' }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ $key->created_at->format('M d, Y') }}</td>
@@ -111,7 +111,7 @@
                                         </svg>
                                         Copy
                                     </button>
-                                    @if(!$key->is_used)
+                                    @if(!$key->usage)
                                     <button wire:click="deleteKey({{ $key->id }})" class="ml-3 inline-flex items-center text-red-400 hover:text-red-300">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -142,8 +142,8 @@
                                        substr($key->key_string, -4) }}
                                 </span>
                             </div>
-                            <span class="px-3 py-1 text-xs leading-5 font-semibold rounded-full {{ $key->is_used ? 'bg-red-900 text-red-200' : 'bg-green-900 text-green-200' }}">
-                                {{ $key->is_used ? 'Used' : 'Unused' }}
+                            <span class="px-3 py-1 text-xs leading-5 font-semibold rounded-full {{ $key->usage ? 'bg-red-900 text-red-200' : 'bg-green-900 text-green-200' }}">
+                                {{ $key->usage ? 'Used' : 'Unused' }}
                             </span>
                         </div>
                         <div class="text-sm text-gray-400 mt-1">
@@ -163,7 +163,7 @@
                                 </svg>
                                 Copy
                             </button>
-                            @if(!$key->is_used)
+                            @if(!$key->usage)
                             <button wire:click="deleteKey({{ $key->id }})" class="inline-flex items-center text-red-400 hover:text-red-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

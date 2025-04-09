@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
@@ -35,6 +36,10 @@ class Login extends Component
 
         if ($validator->fails()) {
             return back()->with('error', 'Invalid login details');
+        }
+
+        if (User::query()->where('email', '=', $this->email)->first()->suspended !== null) {
+            return back()->with('error', 'Your account has been suspended by Admin. Please contact support.');
         }
 
         if (!Auth::attempt(['email' => $this->email, 'password' => $this->password])) {

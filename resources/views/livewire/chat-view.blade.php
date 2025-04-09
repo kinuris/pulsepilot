@@ -4,25 +4,27 @@
         <div class="flex flex-col h-full">
             <div class="flex justify-between items-center mb-4">
                 <h1 class="text-2xl font-semibold text-gray-800">Messages</h1>
-                <div class="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">
-                    <span class="text-sm font-medium text-blue-700">12 unread</span>
-                    <div class="h-2 w-2 bg-blue-600 rounded-full"></div>
-                </div>
+                
             </div>
 
             <div class="flex gap-3 py-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 @foreach (Auth::user()->patients() as $patient)
-                <div @if($selectedPatientId !==$patient->id) wire:click="setSelectedPatient({{ $patient->id }})" @else wire:click="setSelectedPatient(null)" @endif
+                <div @if($selectedPatientId !== $patient->id) wire:click="setSelectedPatient({{ $patient->id }})" @else wire:click="setSelectedPatient(null)" @endif
                     class="flex-shrink-0 w-64 {{ $selectedPatientId == $patient->id ? 'bg-blue-50 border-2 border-blue-500' : 'bg-white hover:bg-gray-50' }} rounded-lg shadow-sm p-4 cursor-pointer transition-all duration-200 ease-in-out hover:shadow-md">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center text-blue-600 font-semibold">
                             {{ substr($patient->name, 0, 1) }}
                         </div>
-                        <div>
+                        <div wire:poll.5s>
                             <h3 class="font-medium text-gray-800">{{ $patient->name }}</h3>
                             <div class="flex items-center text-xs">
-                                <div class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-1"></div>
-                                <span class="text-emerald-600">Online</span>
+                                @if($patient->isOnline())
+                                    <div class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-1"></div>
+                                    <span class="text-emerald-600">Online</span>
+                                @else
+                                    <div class="h-1.5 w-1.5 bg-gray-400 rounded-full mr-1"></div>
+                                    <span class="text-gray-500">Offline</span>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -30,8 +32,24 @@
                 @endforeach
             </div>
 
-            <div id="messageContainer" class="flex-1 overflow-y-auto p-5 mt-1 space-y-4 bg-white rounded-xl shadow border border-gray-100 relative" wire:poll.1s="refreshMessage">
+            <div id="messageContainer" class="flex-1 overflow-y-auto p-5 space-y-4 bg-white rounded-xl shadow border border-gray-100 relative" wire:poll.1s="refreshMessage">
                 @if ($selectedPatient)
+                <!-- Loading indicator for message history -->
+                <div 
+                    wire:loading wire:target="loadMore"
+                    class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white py-4 px-6 flex items-center justify-center shadow-md rounded-xl z-50 transition-all duration-50 ease-in-out border border-gray-200 w-auto max-w-xs opacity-0"
+                    wire:loading.class="opacity-100 top-4">
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="loader">
+                            <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-sm font-medium text-gray-700">Loading previous messages...</span>
+                    </div>
+                </div>
+
                 <div class="sticky z-50 top-0 w-fit py-2 px-4 bg-white/90 backdrop-blur-sm border-b border-gray-100 rounded-t-xl flex items-center justify-between shadow-sm mb-4">
                     <div class="flex items-center">
                         <div class="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center text-blue-600 font-semibold">
@@ -39,46 +57,40 @@
                         </div>
                         <div class="flex flex-col ml-3">
                             <span class="text-sm font-medium text-gray-800">{{ $selectedPatient->name }}</span>
-                            <span class="text-xs text-emerald-600 flex items-center">
-                                <div class="h-1.5 w-1.5 bg-emerald-500 rounded-full mr-1"></div>Active Now
+                            <span class="text-xs flex items-center {{ $selectedPatient->isOnline() ? 'text-emerald-600' : 'text-gray-500' }}">
+                                <div class="h-1.5 w-1.5 rounded-full mr-1 {{ $selectedPatient->isOnline() ? 'bg-emerald-500' : 'bg-gray-400' }}"></div>
+                                {{ $selectedPatient->isOnline() ? 'Online' : 'Offline' }}
                             </span>
                         </div>
                     </div>
                 </div>
 
                 @foreach($messageThread ?? [] as $message)
-                <div wire:key="message-{{ $message->id }}"
-                    x-data="{ show: false }"
-                    x-init="setTimeout(() => show = true, 0)"
-                    x-show="show"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 transform -translate-y-4"
-                    x-transition:enter-end="opacity-100 transform translate-y-0"
-                    class="flex {{ $message->sender_type === 'patient' ? 'justify-start' : 'justify-end' }}">
+                <div wire:key="message-{{ $message->id }}" class="flex {{ $message->sender_type === 'patient' ? 'justify-start' : 'justify-end' }}">
                     <div class="{{ $message->sender_type === 'patient' ? 'bg-gray-100' : 'bg-blue-600' }} rounded-lg p-2.5 max-w-sm shadow-sm">
                         @if($message->message_type === 'text')
-                            <p class="{{ $message->sender_type === 'patient' ? 'text-gray-800' : 'text-white' }} text-sm">{{ $message->message }}</p>
+                        <p class="{{ $message->sender_type === 'patient' ? 'text-gray-800' : 'text-white' }} text-sm">{{ $message->message }}</p>
                         @elseif($message->message_type === 'image')
-                            <div class="mb-2">
-                                <a href="{{ asset('storage/attachments/' . $message->path) }}" target="_blank" class="block">
-                                    <img src="{{ asset('storage/attachments/' . $message->path) }}" alt="Image" class="rounded-md max-h-48 w-auto object-cover cursor-pointer hover:opacity-90 transition-opacity">
-                                </a>
-                            </div>
-                            @if($message->message)
-                                <p class="{{ $message->sender_type === 'patient' ? 'text-gray-800' : 'text-white' }} text-sm">{{ $message->message }}</p>
-                            @endif
+                        <div class="mb-2">
+                            <a href="{{ asset('storage/attachments/' . $message->path) }}" target="_blank" class="block">
+                                <img src="{{ asset('storage/attachments/' . $message->path) }}" alt="Image" class="rounded-md max-h-48 w-auto object-cover cursor-pointer hover:opacity-90 transition-opacity">
+                            </a>
+                        </div>
+                        @if($message->message)
+                        <p class="{{ $message->sender_type === 'patient' ? 'text-gray-800' : 'text-white' }} text-sm">{{ $message->message }}</p>
+                        @endif
                         @elseif($message->message_type === 'pdf')
-                            <div class="flex items-center mb-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 {{ $message->sender_type === 'patient' ? 'text-red-500' : 'text-white' }} mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                </svg>
-                                <a href="{{ asset('storage/attachments/' . $message->path) }}" target="_blank" class="{{ $message->sender_type === 'patient' ? 'text-blue-600 hover:underline' : 'text-white hover:text-blue-100' }} text-sm font-medium">
-                                    View PDF
-                                </a>
-                            </div>
-                            @if($message->message)
-                                <p class="{{ $message->sender_type === 'patient' ? 'text-gray-800' : 'text-white' }} text-sm">{{ $message->message }}</p>
-                            @endif
+                        <div class="flex items-center mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 {{ $message->sender_type === 'patient' ? 'text-red-500' : 'text-white' }} mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            <a href="{{ asset('storage/attachments/' . $message->path) }}" target="_blank" class="{{ $message->sender_type === 'patient' ? 'text-blue-600 hover:underline' : 'text-white hover:text-blue-100' }} text-sm font-medium">
+                                View PDF
+                            </a>
+                        </div>
+                        @if($message->message)
+                        <p class="{{ $message->sender_type === 'patient' ? 'text-gray-800' : 'text-white' }} text-sm">{{ $message->message }}</p>
+                        @endif
                         @endif
                         <span class="{{ $message->sender_type === 'patient' ? 'text-xs text-gray-500' : 'text-xs text-blue-100' }} block mt-1">{{ $message->created_at->diffForHumans() }}</span>
                     </div>
@@ -181,7 +193,8 @@
             previousScrollHeight = chat.scrollHeight;
 
             // Dispatch the loadMore event to Livewire
-            $wire.dispatch('loadMore');
+            // $wire.dispatch('loadMore');
+            $wire.loadMore();
         }
     }
 

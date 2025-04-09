@@ -7,6 +7,7 @@ use App\Models\Patient;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 
@@ -14,7 +15,9 @@ class ChatView extends Component
 {
     use WithFileUploads;
 
+    #[Url(as: 'p')]
     public int|null $selectedPatientId = null;
+
     public int|null $lastMessageId = null;
 
     public $attachment;
@@ -30,7 +33,7 @@ class ChatView extends Component
             return;
         }
 
-        $this->messageThread = ChatMessage::historyOf(Patient::query()->find($this->selectedPatientId), Auth::user(), $this->messageCount);
+        $this->messageThread = ChatMessage::historyOf(Patient::query()->find($this->selectedPatientId), Auth::user(), $this->messageCount) ?? new Collection([]);
         $this->lastMessageId = $this->messageThread->last()?->id;
     }
 
@@ -41,7 +44,15 @@ class ChatView extends Component
             return;
         }
 
+        $startTime = microtime(true);
+
         $this->messageThread = ChatMessage::historyOf(Patient::query()->find($this->selectedPatientId), Auth::user(), $this->messageCount += 10) ?? new Collection();
+
+        $elapsedTime = (microtime(true) - $startTime) * 1000;
+        if ($elapsedTime < 200) {
+            usleep((200 - $elapsedTime) * 1000);
+        }
+
         $this->dispatch('indirection');
     }
 

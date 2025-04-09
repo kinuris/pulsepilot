@@ -33,8 +33,8 @@
                             <div>
                                 <h3 class="text-lg leading-6 font-semibold text-gray-900">Appointment Details</h3>
                                 @if(isset($viewedAppointment['status']))
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $this->getStatusColor($viewedAppointment['status']) }}-100 text-{{ $this->getStatusColor($viewedAppointment['status']) }}-800 mt-1">
-                                        <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-{{ $this->getStatusColor($viewedAppointment['status']) }}-500"></span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $this->getStatusColor(ucwords($viewedAppointment['status'])) }}-100 text-{{ $this->getStatusColor(ucwords($viewedAppointment['status'])) }}-800 mt-1">
+                                        <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-{{ $this->getStatusColor(ucwords($viewedAppointment['status'])) }}-500"></span>
                                         {{ $viewedAppointment['status'] }}
                                     </span>
                                 @endif
@@ -96,7 +96,7 @@
                             <div>
                                 <div class="flex items-center space-x-2">
                                     <span class="text-xs font-medium text-gray-500">Status</span>
-                                    <span class="w-2 h-2 rounded-full inline-block bg-{{ $this->getStatusColor($viewedAppointmentStatus) }}-500"></span>
+                                    <span class="w-2 h-2 rounded-full inline-block bg-{{ $this->getStatusColor(ucwords($viewedAppointmentStatus)) }}-500"></span>
                                 </div>
 
                                 <div class="mt-1">
@@ -110,7 +110,7 @@
                                 </div>
 
                                 @if(($viewedAppointmentStatus !== ($viewedAppointment['status'] ?? '') && $viewedAppointment !== null))
-                                <div wire:transition class="mt-1 text-xs text-{{ $this->getStatusColor($viewedAppointmentStatus) }}-600 font-medium flex items-center">
+                                <div wire:transition class="mt-1 text-xs text-{{ $this->getStatusColor(ucwords($viewedAppointmentStatus)) }}-600 font-medium flex items-center">
                                     <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                     </svg>
@@ -362,9 +362,9 @@
                         </div>
                     </div>
                     @forelse($schedules->where('appointment_date', $currentDate)->sortBy('appointment_time') as $schedule)
-                    <div wire:click="viewAppointment({{ $schedule->id }})" class="mb-2 p-2 rounded hover:bg-gray-50 transition-colors border-l-4 border-{{ $this->getStatusColor($schedule->status) }}-400 flex items-center shadow-sm cursor-pointer">
+                    <div wire:click="viewAppointment({{ $schedule->id }})" class="mb-2 p-2 rounded hover:bg-gray-50 transition-colors border-l-4 border-{{ $this->getStatusColor(ucwords($schedule->status)) }}-400 flex items-center shadow-sm cursor-pointer">
                         <div class="w-16 text-xs text-gray-600 font-medium">{{ date('g:i A', strtotime($schedule->appointment_time)) }}</div>
-                        <div class="flex-1 font-medium">{{ $schedule->patient->name ?? 'Patient' }} <span class="text-xs bg-{{ $this->getStatusColor($schedule->status) }}-100 text-{{ $this->getStatusColor($schedule->status) }}-800 px-2 py-0.5 rounded-full ml-2">{{ $schedule->status }}</span></div>
+                        <div class="flex-1 font-medium">{{ $schedule->patient->name ?? 'Patient' }} <span class="text-xs bg-{{ $this->getStatusColor(ucwords($schedule->status)) }}-100 text-{{ $this->getStatusColor(ucwords($schedule->status)) }}-800 px-2 py-0.5 rounded-full ml-2">{{ $schedule->status }}</span></div>
                         <div class="text-sm text-gray-500">{{ $schedule->reason }}</div>
                     </div>
                     @empty
@@ -421,12 +421,12 @@
                                 @endif
                             </div>
                             @foreach($schedules->where('appointment_date', $day['date'])->sortBy('appointment_time')->take(3) as $schedule)
-                            <div wire:click="viewAppointment({{ $schedule->id }})" class="mb-2 p-1.5 rounded hover:bg-gray-50 transition-colors border-l-3 border-{{ $this->getStatusColor($schedule->status) }}-400 shadow-sm cursor-pointer group flex items-start gap-1">
+                            <div wire:click="viewAppointment({{ $schedule->id }})" class="mb-2 p-1.5 rounded hover:bg-gray-50 transition-colors border-l-3 border-{{ $this->getStatusColor(ucwords($schedule->status)) }}-400 shadow-sm cursor-pointer group flex items-start gap-1">
                                 <div class="flex-1">
                                     <div class="text-xs text-gray-500 group-hover:text-gray-700">{{ date('g:i A', strtotime($schedule->appointment_time)) }}</div>
                                     <div class="font-medium text-sm truncate">{{ $schedule->patient->name ?? 'Patient' }}</div>
                                 </div>
-                                <div class="w-1.5 h-1.5 rounded-full bg-{{ $this->getStatusColor($schedule->status) }}-500 flex-shrink-0"></div>
+                                <div class="w-1.5 h-1.5 rounded-full bg-{{ $this->getStatusColor(ucwords($schedule->status)) }}-500 flex-shrink-0"></div>
                             </div>
                             @endforeach
                             @php $remaining = $schedules->where('appointment_date', $day['date'])->count() - 3; @endphp
@@ -491,12 +491,12 @@
                             </div>
                             @if($day['in_month'])
                             @foreach($schedules->where('appointment_date', '=', $day['date'])->sortBy('appointment_time')->take(2) as $schedule)
-                            <div wire:click="viewAppointment({{ $schedule->id }})" class="mb-1.5 p-1.5 rounded-md hover:bg-gray-50 transition-colors border-l-3 border-{{ $this->getStatusColor($schedule->status) }}-400 shadow-sm cursor-pointer bg-white flex items-start gap-1">
+                            <div wire:click="viewAppointment({{ $schedule->id }})" class="mb-1.5 p-1.5 rounded-md hover:bg-gray-50 transition-colors border-l-3 border-{{ $this->getStatusColor(ucwords($schedule->status)) }}-400 shadow-sm cursor-pointer bg-white flex items-start gap-1">
                                 <div class="flex-1">
                                     <div class="text-[10px] text-gray-500 font-medium">{{ date('g:i', strtotime($schedule->appointment_time)) }} - {{ date('g:ia', strtotime($schedule->appointment_time . ' + ' . $schedule->duration_minutes . ' minutes')) }}</div>
                                     <div class="font-medium text-xs truncate text-gray-800">{{ $schedule->patient->name ?? 'Patient' }}</div>
                                 </div>
-                                <div class="w-1.5 h-1.5 rounded-full bg-{{ $this->getStatusColor($schedule->status) }}-500 flex-shrink-0"></div>
+                                <div class="w-1.5 h-1.5 rounded-full bg-{{ $this->getStatusColor(ucwords($schedule->status)) }}-500 flex-shrink-0"></div>
                             </div>
                             @endforeach
                             @php

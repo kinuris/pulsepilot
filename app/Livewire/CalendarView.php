@@ -183,13 +183,15 @@ class CalendarView extends Component
             $slotEnd = date('H:i:s', $currentTime + ($duration * 60));
 
             // Check for collision with existing appointments
-            $hasCollision = $this->existingSchedules()->where('appointment_date', $this->appointmentDate)->some(function ($appointment) use ($slotStart, $slotEnd) {
-                $appointmentStart = $appointment->appointment_time;
-                $appointmentEnd = date('H:i:s', strtotime($appointment->appointment_time) + ($appointment->duration_minutes * 60));
+            $hasCollision = $this->existingSchedules()
+                ->where('appointment_date', $this->appointmentDate)
+                ->some(function ($appointment) use ($slotStart, $slotEnd) {
+                    $appointmentStart = $appointment->appointment_time;
+                    $appointmentEnd = date('H:i:s', strtotime($appointment->appointment_time) + ($appointment->duration_minutes * 60));
 
-                // Check if this slot overlaps with an existing appointment
-                return ($slotStart < $appointmentEnd && $slotEnd > $appointmentStart);
-            });
+                    // Check if this slot overlaps with an existing appointment
+                    return ($slotStart < $appointmentEnd && $slotEnd > $appointmentStart);
+                });
 
             // Only add the slot if there's no collision
             if (!$hasCollision) {

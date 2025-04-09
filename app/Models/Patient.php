@@ -3,9 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Patient extends Model
 {
+    public function isOnline()
+    {
+        $key = 'patient-online-' . $this->id;
+
+        return Cache::has($key);
+    }
+
+    public function lastOnline()
+    {
+        $key = 'most-recent-patient-online-' . $this->id;
+
+        return Cache::get($key);
+    }
+
     public function connections()
     {
         return $this->hasMany(Connection::class);
@@ -19,6 +34,16 @@ class Patient extends Model
     public function pastConditions()
     {
         return $this->hasMany(PastConditionHistory::class);
+    }
+
+    public function bmiRecords()
+    {
+        return $this->hasMany(BmiRecord::class);
+    }
+
+    public function waterRecords()
+    {
+        return $this->hasMany(WaterRecord::class);
     }
 
     public function glucoseRecords()

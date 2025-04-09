@@ -11,6 +11,7 @@ use App\Livewire\PatientDataMigrationView;
 use App\Livewire\PatientManagementView;
 use App\Livewire\PatientView;
 use App\Livewire\RegistrationKeyView;
+use App\Livewire\SettingsView;
 use App\Livewire\Signup;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,7 @@ Route::middleware('role:doctor')->group(function () {
     Route::get('/manage', PatientManagementView::class)->name('manage');
     Route::get('/chat', ChatView::class)->name('chats');
     Route::get('/calendar', CalendarView::class)->name('calendar');
+    Route::get('/settings', SettingsView::class)->name('settings');
 });
 
 Route::middleware('role:admin')->group(function () {
@@ -58,4 +60,12 @@ Route::controller(ApiController::class)->group(function () {
     Route::post('/api/chat/batch/{patient}/{doctor}', 'getChatBatch');
     Route::post('/api/chat/send/{doctor}', 'sendChatMessage');
     Route::post('/api/doctors/{patient}/monitoring', 'getMonitoringDoctors');
+
+    Route::post('/api/online/{patient}/ping', 'pingOnline');
+    Route::post('/api/online/{patient}/doctors', 'getOnlineDoctors');
+
+    Route::post('/api/recover/{recoveryId}', 'recoverData');
+    Route::post('/api/appointment/{user}/timeslots', 'getTimeSlots');
+    Route::post('/api/appointment/{user}/{patient}/create', 'createAppointment');
+    Route::post('/api/appointment/{patient}', 'getAppointments');
 });
