@@ -67,7 +67,7 @@
                         @php($latestBmi = $patient->bmiRecords()->get()->sortBy('recorded_at', descending: true)->first())
                         <p class="text-gray-900 font-medium">
                             @if($latestBmi)
-                                {{ $latestBmi->bmi_value }} ({{ date('F j, Y', strtotime($latestBmi->recorded_at)) }})
+                                {{ number_format($latestBmi->bmi_value, 2) }} ({{ date('F j, Y', strtotime($latestBmi->recorded_at)) }})
                             @else
                                 No BMI record found.
                             @endif
