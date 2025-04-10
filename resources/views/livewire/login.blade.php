@@ -63,4 +63,7 @@
             </button>
         </form>
     </div>
+    <div class="absolute z-50 bottom-4 left-0 right-0 text-center text-white text-xs">
+        Contact PulsePilot at <a href="mailto:support@pulsepilot.info" class="hover:underline">support@pulsepilot.info</a>
+    </div>
 </div>
