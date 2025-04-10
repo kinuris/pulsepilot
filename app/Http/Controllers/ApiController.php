@@ -22,7 +22,8 @@ use Illuminate\Support\Facades\Cache;
 
 class ApiController extends Controller
 {
-    public function revokeDoctor(Request $request, Patient $patient, User $doctor) {
+    public function revokeDoctor(Request $request, Patient $patient, User $doctor)
+    {
         Connection::query()
             ->where('patient_id', $patient->id)
             ->where('user_id', $doctor->id)
@@ -33,7 +34,8 @@ class ApiController extends Controller
         ]);
     }
 
-    public function getAppointments(Request $request, Patient $patient) {
+    public function getAppointments(Request $request, Patient $patient)
+    {
         $appointments = DoctorAppointment::query()
             ->where('patient_id', $patient->id)
             ->with(['doctor'])
@@ -66,6 +68,7 @@ class ApiController extends Controller
         $hasCollision = DoctorAppointment::query()
             ->where('user_id', '=', $user->id)
             ->where('appointment_date', '=', date('Y-m-d', strtotime($request->input('date'))))
+            ->whereNotIn('status', ['canceled', 'rescheduled'])
             ->get()
             ->filter(function ($appointment) use ($appointmentDateTime, $appointmentEndTime) {
                 $existingStart = $appointment->appointment_time;
