@@ -58,6 +58,22 @@
                         <p class="text-gray-900 font-medium">{{ $patient->address }}</p>
                     </div>
                 </div>
+                <div class="p-3 hover:bg-gray-50 rounded-md transition duration-150 flex items-start space-x-3">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-3m3 3v-3m3 3v-3m3 3v-3m3 3v-3M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <div>
+                        <p class="text-gray-600 text-xs uppercase tracking-wider mb-1">Latest BMI Record</p>
+                        @php($latestBmi = $patient->bmiRecords()->get()->sortBy('recorded_at', descending: true)->first())
+                        <p class="text-gray-900 font-medium">
+                            @if($latestBmi)
+                                {{ $latestBmi->bmi_value }} ({{ date('F j, Y', strtotime($latestBmi->recorded_at)) }})
+                            @else
+                                No BMI record found.
+                            @endif
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
