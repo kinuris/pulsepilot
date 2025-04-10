@@ -193,7 +193,7 @@
                             <select wire:model="patientId" id="patient" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-1.5 text-sm bg-gray-50">
                                 <option value="">Select Patient</option>
                                 @foreach($patients as $patient)
-                                <option value="{{ $patient->id }}">{{ $patient->name }}</option>
+                                <option value="{{ $patient->id }}">({{ $patient->id }}) {{ $patient->name }}</option>
                                 @endforeach
                             </select>
                             @error('patientId') <span class="text-xs text-red-600 mt-0.5 block">{{ $message }}</span> @enderror
