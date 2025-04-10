@@ -141,6 +141,7 @@ class ApiController extends Controller
                 $hasCollision = DoctorAppointment::query()
                     ->where('user_id', '=', $user->id)
                     ->where('appointment_date', '=', date('Y-m-d', strtotime($date)))
+                    ->whereNotIn('status', ['canceled', 'rescheduled'])
                     ->get()
                     ->filter(function ($appointment) use ($slotStart, $slotEnd) {
                         $appointmentStart = $appointment->appointment_time;
