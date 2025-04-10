@@ -68,4 +68,5 @@ Route::controller(ApiController::class)->group(function () {
     Route::post('/api/appointment/{user}/timeslots', 'getTimeSlots');
     Route::post('/api/appointment/{user}/{patient}/create', 'createAppointment');
     Route::post('/api/appointment/{patient}', 'getAppointments');
+    Route::post('/api/patient/{patient}/revoke/{doctor}', 'revokeDoctor');
 });

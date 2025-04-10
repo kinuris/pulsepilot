@@ -23,7 +23,7 @@ class PatientNutritionView extends Component
                 'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
             ],
             'json' => [
-                'model' => 'gpt-3.5-turbo',
+                'model' => 'gpt-4o',
                 'input' => 'Pretend that you are an Expert Nutritionist. Generate a 40 word summary of the following foods with nutrition commentary, give the estimated calorie count breakdown for each food item as well as the total calorie count: ' . $record->foods_csv,
             ]
         ]);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActivityRecord;
 use App\Models\BmiRecord;
 use App\Models\ChatMessage;
+use App\Models\Connection;
 use App\Models\DoctorAppointment;
 use App\Models\GlucoseRecord;
 use App\Models\ImmunizationHistory;
@@ -21,6 +22,17 @@ use Illuminate\Support\Facades\Cache;
 
 class ApiController extends Controller
 {
+    public function revokeDoctor(Request $request, Patient $patient, User $doctor) {
+        Connection::query()
+            ->where('patient_id', $patient->id)
+            ->where('user_id', $doctor->id)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Doctor connection revoked successfully.',
+        ]);
+    }
+
     public function getAppointments(Request $request, Patient $patient) {
         $appointments = DoctorAppointment::query()
             ->where('patient_id', $patient->id)
