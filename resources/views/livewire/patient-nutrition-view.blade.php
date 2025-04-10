@@ -97,7 +97,7 @@
                                                     </svg>
                                                 </button>
                                             </div>
-                                            <div class="text-gray-700 text-sm" x-text="aiNotes"></div>
+                                            <div class="text-gray-700 text-sm prose prose-sm" x-html="marked.parse(aiNotes || '')"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -111,3 +111,7 @@
         </div>
     </div>
 </div>
+
+@script
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+@endscript
