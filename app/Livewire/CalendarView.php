@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Jobs\SendGeneralEmail;
 use App\Models\DoctorAppointment;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -185,7 +186,7 @@ class CalendarView extends Component
             // Check for collision with existing appointments
             $hasCollision = $this->existingSchedules()
                 ->where('appointment_date', $this->appointmentDate)
-                ->whereNotIn('status', ['canceled', 'rescheduled'])
+                // ->whereNotIn('status', ['canceled', 'rescheduled'])
                 ->some(function ($appointment) use ($slotStart, $slotEnd) {
                     $appointmentStart = $appointment->appointment_time;
                     $appointmentEnd = date('H:i:s', strtotime($appointment->appointment_time) + ($appointment->duration_minutes * 60));

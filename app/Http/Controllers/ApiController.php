@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendGeneralEmail;
 use App\Models\ActivityRecord;
 use App\Models\BmiRecord;
 use App\Models\ChatMessage;
@@ -28,6 +29,34 @@ class ApiController extends Controller
             ->where('patient_id', $patient->id)
             ->where('user_id', $doctor->id)
             ->delete();
+
+        $doctorName = $doctor->name; // Assuming User model has a 'name' attribute
+        $patientName = $patient->first_name . ' ' . $patient->last_name;
+
+        $emailSubject = 'PulsePilot: Patient Connection Revoked';
+        $emailBody = '
+    <div style="font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif; max-width: 600px; margin: 20px auto; padding: 25px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f9f9f9;">
+        <div style="text-align: center; padding-bottom: 15px; border-bottom: 1px solid #cccccc; margin-bottom: 25px;">
+        <h1 style="color: #c9302c; font-size: 24px; margin: 0; font-weight: 500;">Connection Revoked</h1>
+        </div>
+        <p style="font-size: 16px; line-height: 1.6; color: #333333;">Dear ' . htmlspecialchars($doctorName) . ',</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333333;">This email serves as confirmation that your connection with patient <strong>' . htmlspecialchars($patientName) . '</strong> has been revoked within the PulsePilot platform.</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333333;">Consequently, you will no longer have access to this patient\'s health records or the ability to interact with them through the PulsePilot system.</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333333;">Should you believe this action was performed in error, please contact the patient directly or reach out to PulsePilot support for assistance.</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333333; margin-top: 30px;">Thank you for your understanding.</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333333;">Sincerely,</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333333; font-weight: bold;">The PulsePilot Team</p>
+        <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #cccccc; font-size: 12px; color: #777777; text-align: center;">
+        <p>This is an automated notification. Please do not reply to this email.</p>
+        <p>&copy; ' . date('Y') . ' PulsePilot. All rights reserved.</p>
+        </div>
+    </div>';
+
+        SendGeneralEmail::dispatch(
+            $doctor->email,
+            $emailSubject,
+            $emailBody
+        );
 
         return response()->json([
             'message' => 'Doctor connection revoked successfully.',
@@ -68,7 +97,7 @@ class ApiController extends Controller
         $hasCollision = DoctorAppointment::query()
             ->where('user_id', '=', $user->id)
             ->where('appointment_date', '=', date('Y-m-d', strtotime($request->input('date'))))
-            ->whereNotIn('status', ['canceled', 'rescheduled'])
+            // ->whereNotIn('status', ['canceled', 'rescheduled'])
             ->get()
             ->filter(function ($appointment) use ($appointmentDateTime, $appointmentEndTime) {
                 $existingStart = $appointment->appointment_time;
@@ -141,7 +170,7 @@ class ApiController extends Controller
                 $hasCollision = DoctorAppointment::query()
                     ->where('user_id', '=', $user->id)
                     ->where('appointment_date', '=', date('Y-m-d', strtotime($date)))
-                    ->whereNotIn('status', ['canceled', 'rescheduled'])
+                    // ->whereNotIn('status', ['canceled', 'rescheduled'])
                     ->get()
                     ->filter(function ($appointment) use ($slotStart, $slotEnd) {
                         $appointmentStart = $appointment->appointment_time;
