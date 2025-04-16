@@ -348,6 +348,28 @@ class ApiController extends Controller
         $labResult->file_path = $file->store('lab-results', 'public');
         $labResult->save();
 
+        SendGeneralEmail::dispatch(
+            $labRequest->doctor->email,
+            'PulsePilot: Lab Result (' . $labRequest->title . '): ' . $patient->first_name . ' ' . $patient->last_name,
+            '
+<div style="font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif; max-width: 600px; margin: 20px auto; padding: 25px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f9f9f9;">
+    <div style="text-align: center; padding-bottom: 15px; border-bottom: 1px solid #cccccc; margin-bottom: 25px;">
+        <h1 style="color: #337ab7; font-size: 24px; margin: 0; font-weight: 500;">New Lab Result Submitted</h1>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; color: #333333;">Dear Dr. ' . htmlspecialchars($labRequest->doctor->name) . ',</p>
+    <p style="font-size: 16px; line-height: 1.6; color: #333333;">A new lab result has been submitted by your patient, <strong>' . htmlspecialchars($patient->first_name . ' ' . $patient->last_name) . '</strong>, for the request titled: <strong>"' . htmlspecialchars($labRequest->title) . '"</strong>.</p>
+    <p style="font-size: 16px; line-height: 1.6; color: #333333;">You can view the submitted result by logging into your PulsePilot dashboard.</p>
+    <p style="font-size: 16px; line-height: 1.6; color: #333333; margin-top: 30px;">Thank you for using PulsePilot.</p>
+    <p style="font-size: 16px; line-height: 1.6; color: #333333;">Sincerely,</p>
+    <p style="font-size: 16px; line-height: 1.6; color: #333333; font-weight: bold;">The PulsePilot Team</p>
+    <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #cccccc; font-size: 12px; color: #777777; text-align: center;">
+        <p>This is an automated notification. Please do not reply to this email.</p>
+        <p>&copy; ' . date('Y') . ' PulsePilot. All rights reserved.</p>
+    </div>
+</div>
+'
+        );
+
         return response()->json([
             'message' => 'Lab result submitted successfully',
         ]);
