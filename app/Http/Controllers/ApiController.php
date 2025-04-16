@@ -350,14 +350,14 @@ class ApiController extends Controller
 
         SendGeneralEmail::dispatch(
             $labRequest->doctor->email,
-            'PulsePilot: Lab Result (' . $labRequest->title . '): ' . $patient->first_name . ' ' . $patient->last_name,
+            'PulsePilot: Lab Result (' . $labRequest->type . '): ' . $patient->first_name . ' ' . $patient->last_name,
             '
 <div style="font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif; max-width: 600px; margin: 20px auto; padding: 25px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f9f9f9;">
     <div style="text-align: center; padding-bottom: 15px; border-bottom: 1px solid #cccccc; margin-bottom: 25px;">
         <h1 style="color: #337ab7; font-size: 24px; margin: 0; font-weight: 500;">New Lab Result Submitted</h1>
     </div>
     <p style="font-size: 16px; line-height: 1.6; color: #333333;">Dear Dr. ' . htmlspecialchars($labRequest->doctor->name) . ',</p>
-    <p style="font-size: 16px; line-height: 1.6; color: #333333;">A new lab result has been submitted by your patient, <strong>' . htmlspecialchars($patient->first_name . ' ' . $patient->last_name) . '</strong>, for the request titled: <strong>"' . htmlspecialchars($labRequest->title) . '"</strong>.</p>
+    <p style="font-size: 16px; line-height: 1.6; color: #333333;">A new lab result has been submitted by your patient, <strong>' . htmlspecialchars($patient->first_name . ' ' . $patient->last_name) . '</strong>, for the request titled: <strong>"' . htmlspecialchars($labRequest->type) . '"</strong>.</p>
     <p style="font-size: 16px; line-height: 1.6; color: #333333;">You can view the submitted result by logging into your PulsePilot dashboard.</p>
     <p style="font-size: 16px; line-height: 1.6; color: #333333; margin-top: 30px;">Thank you for using PulsePilot.</p>
     <p style="font-size: 16px; line-height: 1.6; color: #333333;">Sincerely,</p>
