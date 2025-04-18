@@ -7,7 +7,7 @@
     @endphp
 
     @php
-    $labAlerts = collect(Cache::get('labalert-keys', []))->map(function($key) {
+    $labAlerts = collect(Cache::get('labalert-keys-' . Auth::user()->id, []))->map(function($key) {
     return Cache::get($key);
     })->filter();
     @endphp

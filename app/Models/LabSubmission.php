@@ -31,10 +31,10 @@ class LabSubmission extends Model
             ]);
 
             // Maintain a list of keys
-            $allKeys = Cache::get('labalert-keys', []);
+            $allKeys = Cache::get('labalert-keys-' . $labSubmission->labRequest->doctor->id, []);
             if (!in_array($key, $allKeys)) {
                 $allKeys[] = $key;
-                Cache::forever('labalert-keys', $allKeys);
+                Cache::forever('labalert-keys-' . $labSubmission->labRequest->doctor->id, $allKeys);
             }
         });
     }
